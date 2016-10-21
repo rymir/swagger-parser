@@ -401,10 +401,13 @@ class SwaggerParser(object):
         """
         list_def_candidate = []
         for definition_name in self.specification['definitions'].keys():
-            if self.validate_definition(definition_name, dict):
+            try:
+                self.validate_definition(definition_name, dict)
                 if not get_list:
                     return definition_name
                 list_def_candidate.append(definition_name)
+            except:
+                pass
         if get_list:
             return list_def_candidate
         return None
@@ -439,9 +442,11 @@ class SwaggerParser(object):
                 definition = self._definition_from_example(first_value)
                 definition_name = 'self generated'
             for item in response.values():
-                if not self.validate_definition(definition_name,
-                                                item,
-                                                definition=definition):
+                try:
+                    self.validate_definition(definition_name,
+                                             item,
+                                             definition=definition)
+                except:
                     return False
             return True
 
@@ -471,23 +476,23 @@ class SwaggerParser(object):
         if (definition_name not in self.specification['definitions'].keys() and
                 definition is None):
             # reject unknown definition
-            return False
+            raise Exception('Unknown definition')
 
         # Check all required in dict_to_test
         spec_def = definition or self.specification['definitions'][definition_name]
         all_required_keys_present = all(req in dict_to_test.keys() for req in spec_def.get('required', {}))
         if 'required' in spec_def and not all_required_keys_present:
-            return False
+            raise Exception('Not all required attributes are present.')
 
         # Check no extra arg & type
         properties_dict = spec_def['properties']
         for key, value in dict_to_test.items():
             if value is not None:
                 if key not in properties_dict:  # Extra arg
-                    return False
+                    raise Exception('Extra attribute: "{}"'.format(key))
                 else:  # Check type
                     if not self._validate_type(properties_dict[key], value):
-                        return False
+                        raise Exception('Type mismatch for "{}" got "{}"'.format(key, value))
 
         return True
 
@@ -761,9 +766,12 @@ class SwaggerParser(object):
                     if 'type' in param_spec['schema'].keys() and param_spec['schema']['type'] == 'array':
                         # It is an array get value from definition
                         definition_name = self.get_definition_name_from_ref(param_spec['schema']['items']['$ref'])
-                        if len(body) > 0 and not self.validate_definition(definition_name, body[0]):
-                            msg = "The body did not validate against its definition"
-                            return False, msg
+                        try:
+                            self.validate_definition(definition_name, body[0])
+                        except:
+                            if len(body) > 0:
+                                msg = "The body did not validate against its definition"
+                                return False, msg
                     elif ('type' in param_spec['schema'].keys() and not
                           self.check_type(body, param_spec['schema']['type'])):
                         # Type but not array
@@ -771,7 +779,9 @@ class SwaggerParser(object):
                         return False, msg
                     else:
                         definition_name = self.get_definition_name_from_ref(param_spec['schema']['$ref'])
-                        if not self.validate_definition(definition_name, body):
+                        try:
+                            self.validate_definition(definition_name, body)
+                        except:
                             msg = "The body did not validate against its definition"
                             return False, msg
         # Check required
