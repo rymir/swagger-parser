@@ -133,12 +133,7 @@ class SwaggerParser(object):
             True if the type is correct, False otherwise.
         """
         if type_def == 'integer':
-            try:
-                # We accept string with integer ex: '123'
-                int(value)
-                return True
-            except ValueError:
-                return isinstance(value, six.integer_types) and not isinstance(value, bool)
+            return isinstance(value, six.integer_types) and not isinstance(value, bool)
         elif type_def == 'number':
             return isinstance(value, (six.integer_types, float)) and not isinstance(value, bool)
         elif type_def == 'string':

@@ -45,7 +45,6 @@ def test_check_type(swagger_parser):
     # Test int
     assert swagger_parser.check_type(int(5), 'integer')
     assert swagger_parser.check_type(int(5), 'number')
-    assert swagger_parser.check_type('5', 'integer')
     assert not swagger_parser.check_type(int(5), 'string')
     assert not swagger_parser.check_type(int(5), 'boolean')
 
