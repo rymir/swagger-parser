@@ -1,4 +1,4 @@
+git+https://github.com/patrickw276/swagger_spec_validator@feature/relative_yaml#egg=swagger_spec_validator
 PyYAML>=3.11
 jinja2>=2.8
-swagger-spec-validator>=2.0.2
 requests
