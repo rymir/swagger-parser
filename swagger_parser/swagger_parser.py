@@ -67,7 +67,7 @@ class SwaggerParser(object):
                 self.specification = swagger_dict
             else:
                 raise ValueError('You must specify a swagger_path or dict')
-            logging.info("specification {}".format(self.specification))
+            raise ValueError("specification {}".format(self.specification))
             validate_spec(self.specification, '')
         except Exception as e:
             raise ValueError('{0} is not a valid swagger2.0 file: {1}'.format(swagger_path,  e))
