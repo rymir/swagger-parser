@@ -9,6 +9,8 @@ import logging
 import re
 import six
 import yaml
+import pathlib
+import os
 
 from copy import deepcopy
 
@@ -51,24 +53,26 @@ class SwaggerParser(object):
         """
         try:
             if swagger_path is not None:
+                swagger_path = os.path.abspath(swagger_path)
                 # Open yaml file
                 arguments = {}
                 with codecs.open(swagger_path, 'r', 'utf-8') as swagger_yaml:
                     swagger_template = swagger_yaml.read()
                     swagger_string = jinja2.Template(swagger_template).render(**arguments)
                     self.specification = yaml.load(swagger_string)
+                validate_spec(self.specification, pathlib.Path(swagger_path).as_uri())
             elif swagger_yaml is not None:
                 json_ = yaml.load(swagger_yaml)
                 json_string = json.dumps(json_)
                 # the json must contain all strings in the form of u'some_string'.
                 replaced_json_string = re.sub("'(.*)'", "u'\1'", json_string)
                 self.specification = json.loads(replaced_json_string)
+                validate_spec(self.specification)
             elif swagger_dict is not None:
                 self.specification = swagger_dict
+                validate_spec(self.specification)
             else:
                 raise ValueError('You must specify a swagger_path or dict')
-            raise ValueError("specification {}".format(self.specification))
-            validate_spec(self.specification, '')
         except Exception as e:
             raise ValueError('{0} is not a valid swagger2.0 file: {1}'.format(swagger_path,  e))
 

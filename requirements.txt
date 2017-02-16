@@ -2,3 +2,4 @@ git+https://github.com/rymir/swagger_spec_validator@yaml#egg=swagger_spec_valida
 PyYAML>=3.11
 jinja2>=2.8
 requests
+pathlib
