@@ -60,7 +60,6 @@ class SwaggerParser(object):
                     swagger_template = swagger_yaml.read()
                     swagger_string = jinja2.Template(swagger_template).render(**arguments)
                     self.specification = yaml.load(swagger_string)
-                raise ValueError('spec {} spec_url {}'.format(self.specification, pathlib.Path(swagger_path).as_uri()))
                 validate_spec(self.specification, spec_url=pathlib.Path(swagger_path).as_uri())
             elif swagger_yaml is not None:
                 json_ = yaml.load(swagger_yaml)
